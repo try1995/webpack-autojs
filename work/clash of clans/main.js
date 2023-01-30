@@ -25,16 +25,19 @@ var day_attack_point;
 var day_find_point;
 var next_point;
 var next_image;
+var source_clip_path
 /*
 autox不能打开稳定模式
 */
 
 function init_vars() {
-  let day_find_image = images.read("./temp/day_find.jpg")
-  let day_base_image = images.read("./temp/day_base.jpg");
-  let day_attack_image = images.read("./temp/day_attack.jpg")
-  let day_base_find_image = images.read("./temp/day_base_find.jpg")
-  next_image = images.read("./temp/next_clip.jpg")
+  let day_find_image = images.read("/sdcard/脚本/temp/day_find.jpg")
+  let day_base_image = images.read("/sdcard/脚本/temp/day_base.jpg");
+  let day_attack_image = images.read("/adcard/脚本/temp/day_attack.jpg")
+  let day_base_find_image = images.read("/scard/脚本/temp/day_base_find.jpg")
+  let base_path = "/sdcard/脚本/temp/"
+  source_clip_path = base_path + "source_clip.png"
+  next_image = images.read(base_path + "next_clip.jpg")
   // let result = images.matchTemplate(day_base_image, day_attack_image, {threshold: 0.7})
   // let point = result.points[0]
   // point.x += day_attack_image.width / 2
@@ -49,14 +52,6 @@ function init_vars() {
   next_point = [2103, 835]
 }
 
-function versus_battle() {
-  toastLog("开始执行")
-  console.log("点击进攻")
-  click(100, 1100)
-  sleep(1000)
-  console.log("点击立即寻找")
-  click(1280, 518)
-}
 
 /*
 基本方法1：寻找图片返回坐标
@@ -80,7 +75,7 @@ function ocr_source() {
       console.log("找到下一个按钮")
       console.log(result.matches[0])
       var source_clip = images.clip(src, 183, 155, 366-187, 400-130)
-      images.saveImage(source_clip, "./temp/source_clip.png")
+      images.saveImage(source_clip, source_clip_path)
       console.log("截图保存")
       var res = gmlkit.ocr(source_clip, "zh").text.split("\n")
       console.log(res)
@@ -127,7 +122,6 @@ function find_attack(target) {
     return true
   }
   else {
-    toastLog("点击下一个")
     click(next_point[0], next_point[1])
     return false
   }
@@ -167,4 +161,18 @@ function mutiplayer() {
 
 }
 
-mutiplayer()
+// 音量键监听
+events.observeKey()
+events.onKeyDown("volume_up", function(event) {
+  threads.start(function(){
+    mutiplayer()
+  })
+})
+events.onKeyDown("volume_down", function(event) {
+  toastLog("脚本已结束")
+  threads.shutDownAll()
+})
+
+events.on("exit", function() {
+  toastLog("脚本已结束")
+})

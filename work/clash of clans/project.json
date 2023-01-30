@@ -1,5 +1,5 @@
 {
-    "name": "云控demo",
+    "name": "coc demo",
     "main": "main.js",
     "ignore": [
         "build"
