@@ -13,14 +13,14 @@ if (!requestScreenCapture()) {
 }
 
 var back_image
-var find_image
+var attack_image
 var points
 var base_darw_path
 
 function init_vars() {
     let base_path = "/sdcard/脚本/temp/"
     base_darw_path = base_path + "base_draw.png"
-    find_image = images.read(base_path + "night_find.jpg") 
+    attack_image = images.read(base_path + "night_find.jpg") 
     back_image = images.read(base_path + "night_back.jpg")
 }
 
@@ -89,7 +89,6 @@ function send_troops() {
         else if (count > 70) {
             click(1058, 1016)
             sleep(300)
-            // TODO 检测回营
             let base = images.captureScreen()
             let result = images.matchTemplate(base, back_image, {threshold: 0.8})
             if (result.matches[0]) {
@@ -113,7 +112,7 @@ function find_attack() {
     while (true) {
         sleep(500)
         var src = images.captureScreen()
-        let result = images.matchTemplate(src, find_image, {threshold: 0.8})
+        let result = images.matchTemplate(src, attack_image, {threshold: 0.8})
             if (result.matches[0]) {
                 break
             }

@@ -117,8 +117,13 @@ function ocr_source() {
 }
 
 function find_attack(target) {
-    if (global_resources.gold > target.gold || global_resources.elixir > target.elixir 
-  || global_resources.dark_exixir > target.dark_exixir || global_resources.trophy > target.trophy) {
+  // 单项比目标值大
+    if (global_resources.gold > target.gold + 200000 || global_resources.elixir > target.elixir + 200000
+  || global_resources.dark_exixir > target.dark_exixir + 2000 || global_resources.trophy > target.trophy + 10) {
+    return true
+  }
+  // 金+水
+  else if (global_resources.gold + global_resources.elixir > target.gold + target.elixir) {
     return true
   }
   else {
@@ -137,8 +142,8 @@ function mutiplayer() {
   click(day_find_point[0], day_find_point[1])
 
   var target = {
-  gold: 750000,
-  elixir: 800000,
+  gold: 700000,
+  elixir: 750000,
   dark_exixir: 7500,
   trophy:35
   }
