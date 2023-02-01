@@ -12,25 +12,25 @@ if (!requestScreenCapture()) {
     exit()
 }
 
-var back_image
-var attack_image
-var points
-var base_darw_path
+var night_back_image
+var night_find_image
+var night_attack_points
+var night_base_darw_path
 
 function init_vars() {
     let base_path = "/sdcard/脚本/temp/"
-    base_darw_path = base_path + "base_draw.png"
-    attack_image = images.read(base_path + "night_find.jpg") 
-    back_image = images.read(base_path + "night_back.jpg")
+    night_base_darw_path = base_path + "base_draw.png"
+    night_find_image = images.read(base_path + "night_find.jpg") 
+    night_back_image = images.read(base_path + "night_back.jpg")
 }
 
 
-function find_board(base, right_point, bottom_point) {
-    points = images.findAllPointsForColor(base, "#8f5748",{ region: [0, 0, right_point, bottom_point]})
-    return points
+function night_find_board(base, right_point, bottom_point) {
+    night_attack_points = images.findAllPointsForColor(base, "#8f5748",{ region: [0, 0, right_point, bottom_point]})
+    return night_attack_points
 }
 
-function draw_board() {
+function night_draw_board() {
     var lef_pint = 60
     var right_point = 2294
     var bottom_point = 892
@@ -38,7 +38,7 @@ function draw_board() {
     do {
         sleep(100)
         var base = images.captureScreen();
-        points = find_board(base, right_point, bottom_point)
+        points = night_find_board(base, right_point, bottom_point)
     } while (points.length < 20);
     for (let i=0; i < points.length; i++) {
         if (points[i].x< (lef_pint+right_point)/2) {
@@ -51,15 +51,14 @@ function draw_board() {
     }
     var canvas = new Canvas(base)
     var paint = new Paint()
-    // paint.setColor(colors.parseColor("#2196F3"))
     points.forEach(point => { canvas.drawRect(point.x, point.y, point.x + 10, point.y + 10, paint)
     });
 
     var image = canvas.toImage()
-    images.save(image, base_darw_path)
+    images.save(image, night_base_darw_path)
 }
 
-function send_troops() {
+function night_send_troops() {
     count = 0
     while (true) {
         if (count > 888) {
@@ -72,12 +71,12 @@ function send_troops() {
         else if (count == 20 || count == 25 || count == 30) {
             // 点击机器人
             click(1058, 1016)
-            let num = random(0, points.length-1)
-            click(points[num].x, points[num].y)
+            let num = random(0, night_attack_points.length-1)
+            click(night_attack_points[num].x, night_attack_points[num].y)
             sleep(500)
             // 点击炮车长按
             click(882, 1016)
-            longClick(points[num].x+2, points[num].y+2)
+            longClick(night_attack_points[num].x+2, night_attack_points[num].y+2)
             sleep(500)
         }
         else if (count == 21 || count == 26 || count == 31) {
@@ -90,7 +89,7 @@ function send_troops() {
             click(1058, 1016)
             sleep(300)
             let base = images.captureScreen()
-            let result = images.matchTemplate(base, back_image, {threshold: 0.8})
+            let result = images.matchTemplate(base, night_back_image, {threshold: 0.8})
             if (result.matches[0]) {
                 toastLog("回营")
                 click(1185, 1000)
@@ -99,20 +98,20 @@ function send_troops() {
         }
         else {
             // 放野蛮人
-            let num = random(0, points.length-1)
-            click(points[num].x, points[num].y)
+            let num = random(0, night_attack_points.length-1)
+            click(night_attack_points[num].x, night_attack_points[num].y)
             sleep(random(30, 70))
         }
         count += 1
     }
 }
 
-function find_attack() {
+function night_find_attack() {
     click(178, 996)
     while (true) {
         sleep(500)
         var src = images.captureScreen()
-        let result = images.matchTemplate(src, attack_image, {threshold: 0.8})
+        let result = images.matchTemplate(src, night_find_image, {threshold: 0.8})
             if (result.matches[0]) {
                 break
             }
@@ -121,16 +120,16 @@ function find_attack() {
             }
     }
     click(1500, 490)
-    sleep(5000)
+    sleep(6000)
 }
 
-function main() {
+function night_mutiplayer() {
     init_vars()
     var max_loop = 5
     while (max_loop) {
-        find_attack()
-        draw_board()
-        send_troops()
+        night_find_attack()
+        night_draw_board()
+        night_send_troops()
         sleep(1000)
     }
 }
@@ -139,7 +138,7 @@ function main() {
 events.observeKey()
 events.onKeyDown("volume_up", function(event) {
   threads.start(function(){
-    main()
+    night_mutiplayer()
   })
 })
 events.onKeyDown("volume_down", function(event) {

@@ -15,7 +15,7 @@ if (!requestScreenCapture()) {
     exit()
 }
 
-var global_resources = {
+var day_resources = {
   gold: 0,
   elixir: 0,
   dark_exixir: 0,
@@ -23,10 +23,10 @@ var global_resources = {
 }
 
 var day_attack_point;
-var day_find_point;
-var next_point;
-var next_image;
-var source_clip_path
+var day_attack_point;
+var day_next_point;
+var day_next_image;
+var day_source_clip_path
 
 
 function init_vars() {
@@ -36,8 +36,8 @@ function init_vars() {
   let day_base_find_image = images.read("/scard/脚本/temp/day_base_find.jpg")
   let day_revert_image = images.read(base_path + "revert")
   let base_path = "/sdcard/脚本/temp/"
-  source_clip_path = base_path + "source_clip.png"
-  next_image = images.read(base_path + "next_clip.jpg")
+  day_source_clip_path = base_path + "source_clip.png"
+  day_next_image = images.read(base_path + "next_clip.jpg")
   // let result = images.matchTemplate(day_base_image, day_attack_image, {threshold: 0.7})
   // let point = result.points[0]
   // point.x += day_attack_image.width / 2
@@ -48,14 +48,14 @@ function init_vars() {
   // let point_2 = result_2.points[0]
   // point_2.x += day_find_image.width / 2
   // point_2.y += day_find_image.height / 2
-  day_find_point = [1700, 765]
-  next_point = [2103, 835]
+  day_attack_point = [1700, 765]
+  day_next_point = [2103, 835]
 }
 
-function ocr_source() {
+function day_ocr_source() {
   var max_loop = 100
-  global_resources.gold = 0
-  global_resources.trophy = 0
+  day_resources.gold = 0
+  day_resources.trophy = 0
   console.log("orc_source")
   // var temp_path = "./temp/temp.png"
 
@@ -64,12 +64,12 @@ function ocr_source() {
     // images.captureScreen(temp_path)
     // var src = images.read(temp_path)
     var src = images.captureScreen()
-    let result = images.matchTemplate(src, next_image, {threshold: 0.8})
+    let result = images.matchTemplate(src, day_next_image, {threshold: 0.8})
     if (result.matches[0]) {
       console.log("find the next button")
       console.log(result.matches[0])
       var source_clip = images.clip(src, 183, 155, 366-187, 400-130)
-      images.saveImage(source_clip, source_clip_path)
+      images.saveImage(source_clip, day_source_clip_path)
       console.log("save source clip image")
       var res = gmlkit.ocr(source_clip, "zh").text.split("\n")
       console.log(res)
@@ -82,25 +82,25 @@ function ocr_source() {
         switch(i)
           {
             case 0:
-              global_resources.gold = text
+              day_resources.gold = text
               break
             case 1:
-              global_resources.elixir = text
+              day_resources.elixir = text
               break
             case 2:
-              global_resources.dark_exixir = text
+              day_resources.dark_exixir = text
               break
             case 3:
             case 4:
-              global_resources.trophy = text
+              day_resources.trophy = text
               break
           }
       }
-      if (global_resources.trophy > 60) {
+      if (day_resources.trophy > 60) {
         continue
       }
-      if (global_resources.gold) {
-        toastLog(`result: ${JSON.stringify(global_resources)}`)
+      if (day_resources.gold) {
+        toastLog(`result: ${JSON.stringify(day_resources)}`)
         break
       }
     }
@@ -110,30 +110,30 @@ function ocr_source() {
   
 }
 
-function find_attack(target) {
+function night_find_attack(target) {
   // singal target
-    if (global_resources.gold > target.gold + 200000 || global_resources.elixir > target.elixir + 200000
-  || global_resources.dark_exixir > target.dark_exixir + 2000 || global_resources.trophy > target.trophy + 10) {
+    if (day_resources.gold > target.gold + 200000 || day_resources.elixir > target.elixir + 200000
+  || day_resources.dark_exixir > target.dark_exixir + 2000 || day_resources.trophy > target.trophy + 10) {
     return true
   }
   // gold + elixir 
-  else if (global_resources.gold + global_resources.elixir > target.gold + target.elixir) {
+  else if (day_resources.gold + day_resources.elixir > target.gold + target.elixir) {
     return true
   }
   else {
-    click(next_point[0], next_point[1])
+    click(day_next_point[0], day_next_point[1])
     return false
   }
 }
 
-function mutiplayer() {
+function day_mutiplayer() {
   init_vars()
   console.log("point attack")
   sleep(300)
   click(day_attack_point[0], day_attack_point[1])
   sleep(1000)
   console.log("point find")
-  click(day_find_point[0], day_find_point[1])
+  click(day_attack_point[0], day_attack_point[1])
 
   var target = {
   gold: 700000,
@@ -146,8 +146,8 @@ function mutiplayer() {
   var max_serch = 50
   while (true) {
     console.log(`find ${count} times`)
-    ocr_source()
-    let ret = find_attack(target)
+    day_ocr_source()
+    let ret = night_find_attack(target)
     if (ret || count > max_serch) {
       toastLog("finish!")
       device.vibrate(3000)
@@ -166,7 +166,7 @@ events.observeKey()
 events.onKeyDown("volume_up", function(event) {
   threads.start(function(){
     toastLog("begin!")
-    mutiplayer()
+    day_mutiplayer()
   })
 })
 events.onKeyDown("volume_down", function(event) {

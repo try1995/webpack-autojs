@@ -15,7 +15,7 @@ let base_path = "/sdcard/脚本/temp/"
 let attack_image = images.read(base_path + "day_attack.jpg") 
 let base = images.captureScreen()
 sleep(1000)
-let result = images.matchTemplate(base, attack_image, {threshold: 0.8})
+let result = images.matchTemplate(base, night_find_image, {threshold: 0.8})
 log(result)
 point = result.matches[0].point
 log(point)

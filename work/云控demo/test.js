@@ -15,7 +15,7 @@ var user = {
  * 在本地测试的是 options 是没有值的。
  * 
  */
-function main(options) {
+function night_mutiplayer(options) {
   options = options || {};
   console.show();
   let key=options.key||'touke....'
@@ -24,4 +24,4 @@ function main(options) {
   console.log(user);
 }
 //
-main();
+night_mutiplayer();
