@@ -1,14 +1,14 @@
-//安卓版本高于Android 9
+//android version > 9
 if(device.sdkInt>28){
-    //等待截屏权限申请并同意
+    //wait for captureScreen authority
     threads.start(function () {
         packageName('com.android.systemui').text('ALLOW').waitFor()
         text('ALLOW').click()
     })
 }
-//申请截屏权限
+//require captureScreen authority
 if (!requestScreenCapture()) {
-    toast("请求截图失败")
+    toast("require captureScreen authority fail")
     exit()
 }
 
@@ -66,7 +66,7 @@ function send_troops() {
             break
         }
         else if (count == 0) {
-            // 点击野蛮人
+            // point barbarian
             click(438,1016)
         }
         else if (count == 20 || count == 25 || count == 30) {
