@@ -106,7 +106,7 @@ function night_send_troops() {
     }
 }
 
-function night_find_attack() {
+function day_find_attack() {
     click(178, 996)
     while (true) {
         sleep(500)
@@ -127,7 +127,7 @@ function night_mutiplayer() {
     init_vars()
     var max_loop = 5
     while (max_loop) {
-        night_find_attack()
+        day_find_attack()
         night_draw_board()
         night_send_troops()
         sleep(1000)

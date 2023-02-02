@@ -142,6 +142,23 @@ function night_send_troops() {
   }
 }
 
+function night_find_attack(target) {
+    click(178, 996)
+    while (true) {
+        sleep(500)
+        var src = images.captureScreen()
+        let result = images.matchTemplate(src, night_find_image, {threshold: 0.8})
+            if (result.matches[0]) {
+                break
+            }
+            else {
+                click(178, 996)
+            }
+    }
+    click(1500, 490)
+    sleep(6000)
+}
+
 function night_mutiplayer() {
   var max_loop = 5
   while (max_loop) {
@@ -212,22 +229,22 @@ function day_ocr_source() {
   
 }
 
-function night_find_attack(target) {
-    click(178, 996)
-    while (true) {
-        sleep(500)
-        var src = images.captureScreen()
-        let result = images.matchTemplate(src, night_find_image, {threshold: 0.8})
-            if (result.matches[0]) {
-                break
-            }
-            else {
-                click(178, 996)
-            }
-    }
-    click(1500, 490)
-    sleep(6000)
+function day_find_attack(target) {
+  // singal target
+    if (day_resources.gold > target.gold + 200000 || day_resources.elixir > target.elixir + 200000
+  || day_resources.dark_exixir > target.dark_exixir + 2000 || day_resources.trophy > target.trophy + 10) {
+    return true
+  }
+  // gold + elixir 
+  else if (day_resources.gold + day_resources.elixir > target.gold + target.elixir) {
+    return true
+  }
+  else {
+    click(day_next_point[0], day_next_point[1])
+    return false
+  }
 }
+
 
 function day_mutiplayer() {
   console.log("point attack")
@@ -249,10 +266,10 @@ function day_mutiplayer() {
   while (true) {
     console.log(`find ${count} times`)
     day_ocr_source()
-    let ret = night_find_attack(target)
+    let ret = day_find_attack(target)
     if (ret || count > max_serch) {
-      toastLog("finish!")
-      device.vibrate(3000)
+      toastLog(`finish in ${count} times`)
+      device.vibrate(2000)
       break
     }
     else {
@@ -261,12 +278,12 @@ function day_mutiplayer() {
   }
 }
 
-
+// ---------------------------------------------main---------------
 function main() {
     init_vars()
     let base = images.captureScreen()
     images.saveImage(base, base_path + "temp.png")
-    let result = images.matchTemplate(base, day_attack_image, {threshold: 0.7})
+    let result = images.matchTemplate(base, day_attack_image, {threshold: 0.6})
     log(result)
     if (result.matches[0])  {
         toastLog("day world!")
@@ -278,7 +295,8 @@ function main() {
     }
 }
 
-// home()
+home()
+var exit = false
 // 音量键监听
 events.observeKey()
 events.onKeyDown("volume_up", function(event) {
@@ -289,14 +307,14 @@ events.onKeyDown("volume_up", function(event) {
 })
 events.onKeyDown("volume_down", function(event) {
   toastLog("stop!")
-  threads.shutDownAll()
+  if (exit) {
+    exit()
+  }
+  else {
+    threads.shutDownAll()
+    exit = true
+  }
 })
-
-
-events.onKeyDown("key_back", function(event) {
-  exit()
-})
-
 
 events.on("exit", function() {
   toastLog("exit!")

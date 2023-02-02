@@ -110,7 +110,7 @@ function day_ocr_source() {
   
 }
 
-function night_find_attack(target) {
+function day_find_attack(target) {
   // singal target
     if (day_resources.gold > target.gold + 200000 || day_resources.elixir > target.elixir + 200000
   || day_resources.dark_exixir > target.dark_exixir + 2000 || day_resources.trophy > target.trophy + 10) {
@@ -147,7 +147,7 @@ function day_mutiplayer() {
   while (true) {
     console.log(`find ${count} times`)
     day_ocr_source()
-    let ret = night_find_attack(target)
+    let ret = day_find_attack(target)
     if (ret || count > max_serch) {
       toastLog("finish!")
       device.vibrate(3000)
