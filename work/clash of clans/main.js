@@ -95,7 +95,7 @@ function night_draw_board() {
 }
 
 function night_send_troops() {
-  count = 0
+  let count = 0
   while (true) {
       if (count > 888) {
           break
@@ -296,23 +296,24 @@ function main() {
 }
 
 home()
-var exit = false
+let exit_script
 // 音量键监听
 events.observeKey()
 events.onKeyDown("volume_up", function(event) {
   threads.start(function(){
     toastLog("begin!")
+    exit_script=false
     main()
   })
 })
 events.onKeyDown("volume_down", function(event) {
-  toastLog("stop!")
-  if (exit) {
+  if (exit_script) {
     exit()
   }
   else {
     threads.shutDownAll()
-    exit = true
+    toastLog("stop!")
+    exit_script = true
   }
 })
 
