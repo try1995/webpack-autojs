@@ -11,12 +11,15 @@ if (!requestScreenCapture()) {
     toast("require captureScreen authority fail")
     exit()
 }
-let base_path = "/sdcard/脚本/temp/"
-let attack_image = images.read(base_path + "day_attack.jpg") 
+sleep(1000)
+let base_path = "/sdcard/脚本/images/coc/"
+let attack_image = images.read(base_path + "night_attack.jpg")
 let base = images.captureScreen()
 sleep(1000)
-let result = images.matchTemplate(base, night_find_image, {threshold: 0.8})
+let result = images.matchTemplate(base, attack_image, {threshold:0.1})
 log(result)
-point = result.matches[0].point
+let result2 = images.matchTemplate(base, attack_image, {threshold:0.1})
+log(result2)
+point = result.matches[0].similarity
 log(point)
-click(point.x, point.y)
+// click(point.x, point.y)

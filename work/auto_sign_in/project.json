@@ -1,0 +1,10 @@
+{
+    "name": "auto_sign_in",
+    "main": "main.js",
+    "ignore": [
+        "build"
+    ],
+    "packageName": "com.auto_sign_in.demo",
+    "versionName": "1.7.0",
+    "versionCode": 17
+}

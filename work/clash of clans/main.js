@@ -1,4 +1,12 @@
 /*
+ * @Author: tangruyi 1635341612@qq.com
+ * @Date: 2023-02-03 12:24:06
+ * @LastEditors: tangruyi 1635341612@qq.com
+ * @LastEditTime: 2023-02-04 10:11:43
+ * @FilePath: \webpack-autojs\work\clash of clans\main.js
+ * @Description: coc自动化脚本
+ */
+/*
 autox不能打开稳定模式
 */
 
@@ -31,7 +39,7 @@ var day_find_point
 var day_next_point
 var day_next_image
 var day_source_clip_path
-var revert_image
+var retreat_image
 
 // --------------------night-----------------------
 var night_back_image  // 回营
@@ -42,9 +50,9 @@ var base_path
 
 // --------------------------------------------------
 function init_vars() {
-    base_path = "/sdcard/脚本/temp/"
+    base_path = "/sdcard/脚本/images/coc/"
     day_source_clip_path = base_path + "source_clip.png"
-    revert_image = images.read(base_path + "revert.jpg")
+    retreat_image = images.read(base_path + "retreat.jpg")
     day_next_image = images.read(base_path + "next_clip.jpg")
     day_attack_image = images.read(base_path + "day_attack.jpg")
 
@@ -109,7 +117,7 @@ function night_send_troops() {
           click(1058, 1016)
           let num = random(0, night_attack_points.length-1)
           click(night_attack_points[num].x, night_attack_points[num].y)
-          sleep(500)
+          sleep(random(1000, 3000))
           // 点击炮车长按
           click(882, 1016)
           longClick(night_attack_points[num].x+2, night_attack_points[num].y+2)
@@ -127,7 +135,7 @@ function night_send_troops() {
           let base = images.captureScreen()
           let result = images.matchTemplate(base, night_back_image, {threshold: 0.8})
           if (result.matches[0]) {
-              toastLog("回营")
+              toastLog("back")
               click(1185, 1000)
               break
           }
@@ -142,7 +150,7 @@ function night_send_troops() {
   }
 }
 
-function night_find_attack(target) {
+function night_find_attack() {
     click(178, 996)
     while (true) {
         sleep(500)
@@ -270,7 +278,16 @@ function day_mutiplayer() {
     if (ret || count > max_serch) {
       toastLog(`finish in ${count} times`)
       device.vibrate(2000)
-      break
+      sleep(5000)
+      let base = images.captureScreen()
+      // 检测到撤退再退出
+      let ret = images.matchTemplate(base, retreat_image, {threshold: 0.6})
+      if (ret.matches[0]) {
+        break
+      }
+      else {
+        count = 0
+      }
     }
     else {
       count ++
@@ -283,7 +300,7 @@ function main() {
     init_vars()
     let base = images.captureScreen()
     images.saveImage(base, base_path + "temp.png")
-    let result = images.matchTemplate(base, day_attack_image, {threshold: 0.6})
+    let result = images.matchTemplate(base, day_attack_image, {threshold: 0.5})
     log(result)
     if (result.matches[0])  {
         toastLog("day world!")
@@ -297,7 +314,7 @@ function main() {
 
 home()
 let exit_script
-// 音量键监听
+// 按键监听
 events.observeKey()
 events.onKeyDown("volume_up", function(event) {
   threads.start(function(){
