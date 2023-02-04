@@ -47,6 +47,13 @@ var night_find_image
 var night_attack_points
 var night_base_darw_path
 var base_path
+var troops = {
+  barbarian:0,
+  bomber:1,
+  cannon:2,
+  machine:3
+}
+
 
 // --------------------------------------------------
 function init_vars() {
@@ -75,17 +82,16 @@ function night_find_board(base, right_point, bottom_point) {
 }
 
 function night_draw_board() {
-  var lef_pint = 60
-  var right_point = 2294
-  var bottom_point = 892
+  var lef_point = 0
+  var right_point = 2370
   var points
   do {
       sleep(100)
       var base = images.captureScreen();
-      points = night_find_board(base, right_point, bottom_point)
-  } while (points.length < 20);
+      points = night_find_board(base, 2294, 892)
+  } while (points.length < 25);
   for (let i=0; i < points.length; i++) {
-      if (points[i].x< (lef_pint+right_point)/2) {
+      if (points[i].x< (lef_point+right_point)/2) {
           points[i].x -= 60
       }
       else {
@@ -93,6 +99,7 @@ function night_draw_board() {
       }
       points[i].y -= 20
   }
+  console.log(`find ${points.length} point`)
   var canvas = new Canvas(base)
   var paint = new Paint()
   points.forEach(point => { canvas.drawRect(point.x, point.y, point.x + 10, point.y + 10, paint)
@@ -100,6 +107,26 @@ function night_draw_board() {
 
   var image = canvas.toImage()
   images.save(image, night_base_darw_path)
+}
+
+function click_troops(troop) {
+  let x_index = 738
+  let y_index = 1016
+  let diff = 150
+  switch(troop) {
+    case troops.barbarian: {
+      click(x_index, y_index)
+      break
+    }
+    case troops.cannon: {
+      click(x_index+diff, y_index)
+      break
+    }
+    case troops.machine: {
+      click(x_index+diff*2, y_index)
+      break
+    }
+  }
 }
 
 function night_send_troops() {
@@ -110,30 +137,28 @@ function night_send_troops() {
       }
       else if (count == 0) {
           // point barbarian
-          click(438,1016)
+          click_troops(troops.barbarian)
       }
       else if (count == 20 || count == 25 || count == 30) {
-          // 点击机器人
-          click(1058, 1016)
+          click_troops(troops.machine)
           let num = random(0, night_attack_points.length-1)
           click(night_attack_points[num].x, night_attack_points[num].y)
-          sleep(random(1000, 3000))
+          sleep(random(1000, 2000))
           // 点击炮车长按
-          click(882, 1016)
-          longClick(night_attack_points[num].x+2, night_attack_points[num].y+2)
+          click_troops(troops.cannon)
+          longClick(night_attack_points[num].x+10, night_attack_points[num].y+10)
           sleep(500)
       }
       else if (count == 21 || count == 26 || count == 31) {
           // 点一下技能
-          click(1058, 1010)
-          //回到野蛮人
-          click(720, 1033)
+          click_troops(troops.machine)
+          click_troops(troops.barbarian)
       }
       else if (count > 70) {
-          click(1058, 1016)
+          click_troops(troops.machine)
           sleep(300)
           let base = images.captureScreen()
-          let result = images.matchTemplate(base, night_back_image, {threshold: 0.8})
+          let result = images.matchTemplate(base, night_back_image, {threshold: 0.5})
           if (result.matches[0]) {
               toastLog("back")
               click(1185, 1000)
@@ -141,7 +166,6 @@ function night_send_troops() {
           }
       }
       else {
-          // 放野蛮人
           let num = random(0, night_attack_points.length-1)
           click(night_attack_points[num].x, night_attack_points[num].y)
           sleep(random(30, 70))
@@ -155,7 +179,7 @@ function night_find_attack() {
     while (true) {
         sleep(500)
         var src = images.captureScreen()
-        let result = images.matchTemplate(src, night_find_image, {threshold: 0.8})
+        let result = images.matchTemplate(src, night_find_image, {threshold: 0.5})
             if (result.matches[0]) {
                 break
             }
@@ -321,6 +345,7 @@ events.onKeyDown("volume_up", function(event) {
     toastLog("begin!")
     exit_script=false
     main()
+    exit_script=true
   })
 })
 events.onKeyDown("volume_down", function(event) {
