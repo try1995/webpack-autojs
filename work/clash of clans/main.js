@@ -44,6 +44,7 @@ var retreat_image
 // --------------------night-----------------------
 var night_back_image  // 回营
 var night_find_image
+let night_barbarian_image
 var night_attack_points
 var night_base_darw_path
 var base_path
@@ -65,7 +66,7 @@ function init_vars() {
     retreat_image = images.read(base_path + "retreat.jpg")
     day_next_image = images.read(base_path + "next_clip.jpg")
     day_attack_image = images.read(base_path + "day_attack.jpg")
-
+    night_barbarian_image = images.read(base_path + "barbarian.jpg")
 
 
     night_base_darw_path = base_path + "base_draw.png"
@@ -109,12 +110,17 @@ function night_draw_board() {
   } while (points.length < 45);
   for (let i=0; i < points.length; i++) {
       if (points[i].x< (lef_point+right_point)/2) {
-          points[i].x -= 60
+          points[i].x -= 35
       }
       else {
-          points[i].x += 60
+          points[i].x += 35
       }
-      points[i].y -= 20
+      if (points[i].y < 1100 / 2) {
+        points[i].y -= 20
+      }
+      else {
+        points[i].y += 20
+      }
   }
   toastLog(`find ${points.length} point`)
   var canvas = new Canvas(base)
@@ -124,21 +130,29 @@ function night_draw_board() {
 
   var image = canvas.toImage()
   images.save(image, night_base_darw_path)
+
+  // find the last barbarian point
+  let base = images.captureScreen()
+  let ret = images.matchTemplate(base, night_barbarian_image, {threshold: 0.8})
+  toastLog(`find ${ret.matches.length} barbarians!`)
+  if (ret.matches.length) {
+    night_troop_x = ret.matches[ret.matches.length-1].point.x
+  }
 }
 
-function night_click_troops(troop) {
 
+function night_click_troops(troop) {
   switch(troop) {
     case troops.barbarian: {
-      click(night_troop_x+night_troop_diff, night_troop_y)
+      click(night_troop_x, night_troop_y)
       break
     }
     case troops.cannon: {
-      click(night_troop_x+night_troop_diff*2, night_troop_y)
+      click(night_troop_x+night_troop_diff, night_troop_y)
       break
     }
     case troops.machine: {
-      click(night_troop_x+night_troop_diff*3, night_troop_y)
+      click(night_troop_x+night_troop_diff*2, night_troop_y)
       break
     }
   }
@@ -147,6 +161,7 @@ function night_click_troops(troop) {
 function night_send_troops() {
   let count = 0
   while (true) {
+    let num = random(0, night_attack_points.length-1)
       if (count > 888) {
           break
       }
@@ -156,7 +171,6 @@ function night_send_troops() {
       }
       else if (count == 25 || count == 30) {
           night_click_troops(troops.machine)
-          let num = random(0, night_attack_points.length-1)
           click(night_attack_points[num].x, night_attack_points[num].y)
           night_click_troops(troops.machine)
           sleep(random(1000, 2000))
@@ -165,12 +179,12 @@ function night_send_troops() {
           longClick(night_attack_points[num].x+10, night_attack_points[num].y+10)
           sleep(500)
       }
-      else if (count > 25 && count < 86 && count % 6 == 0) {
+      else if (count > 25 && count < 100 && count % 6 == 0) {
           // 点一下技能
           night_click_troops(troops.machine)
           night_click_troops(troops.barbarian)
       }
-      else if (count > 85) {
+      else if (count > 100) {
           night_click_troops(troops.machine)
           sleep(300)
           let base = images.captureScreen()
@@ -321,12 +335,13 @@ function day_mutiplayer() {
       sleep(5000)
       let base = images.captureScreen()
       // 检测到撤退再退出
-      let ret = images.matchTemplate(base, retreat_image, {threshold: 0.6})
+      let ret = images.matchTemplate(base, retreat_image, {threshold: 0.8})
       if (ret.matches[0]) {
+        toastLog("attacking, exit")
         break
       }
       else {
-        count = 0
+        continue
       }
     }
     else {

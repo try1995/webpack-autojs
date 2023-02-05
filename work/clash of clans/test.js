@@ -20,6 +20,6 @@ let result = images.matchTemplate(base, attack_image, {threshold:0.1})
 log(result)
 let result2 = images.matchTemplate(base, attack_image, {threshold:0.1})
 log(result2)
-point = result.matches[0].similarity
+point = result.matches[0].point
 log(point)
 // click(point.x, point.y)
