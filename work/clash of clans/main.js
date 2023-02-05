@@ -53,7 +53,10 @@ var troops = {
   cannon:2,
   machine:3
 }
-
+// 蛮炮
+let night_troop_x
+let night_troop_y
+let night_troop_diff
 
 // --------------------------------------------------
 function init_vars() {
@@ -63,13 +66,27 @@ function init_vars() {
     day_next_image = images.read(base_path + "next_clip.jpg")
     day_attack_image = images.read(base_path + "day_attack.jpg")
 
-    day_attack_point = [260, 1021]
-    day_find_point = [1700, 765]
-    day_next_point = [2103, 835]
+
 
     night_base_darw_path = base_path + "base_draw.png"
     night_find_image = images.read(base_path + "night_find.jpg") 
     night_back_image = images.read(base_path + "night_back.jpg")
+
+    if (device.product == "ELZ-AN00") {
+      console.log("phone")
+      day_attack_point = [260, 1021]
+      day_find_point = [1700, 765]
+      day_next_point = [2103, 835]
+      night_troop_x = 738
+      night_troop_y = 1016
+      night_troop_diff = 150
+    }
+    else {
+      console.log("table")
+      day_attack_point = [129, 1080]
+      day_find_point = [1328, 700]
+      day_next_point = [2103, 835] 
+    }
 }
 
 
@@ -89,7 +106,7 @@ function night_draw_board() {
       sleep(100)
       var base = images.captureScreen();
       points = night_find_board(base, 2294, 892)
-  } while (points.length < 25);
+  } while (points.length < 45);
   for (let i=0; i < points.length; i++) {
       if (points[i].x< (lef_point+right_point)/2) {
           points[i].x -= 60
@@ -99,7 +116,7 @@ function night_draw_board() {
       }
       points[i].y -= 20
   }
-  console.log(`find ${points.length} point`)
+  toastLog(`find ${points.length} point`)
   var canvas = new Canvas(base)
   var paint = new Paint()
   points.forEach(point => { canvas.drawRect(point.x, point.y, point.x + 10, point.y + 10, paint)
@@ -109,21 +126,19 @@ function night_draw_board() {
   images.save(image, night_base_darw_path)
 }
 
-function click_troops(troop) {
-  let x_index = 738
-  let y_index = 1016
-  let diff = 150
+function night_click_troops(troop) {
+
   switch(troop) {
     case troops.barbarian: {
-      click(x_index, y_index)
+      click(night_troop_x+night_troop_diff, night_troop_y)
       break
     }
     case troops.cannon: {
-      click(x_index+diff, y_index)
+      click(night_troop_x+night_troop_diff*2, night_troop_y)
       break
     }
     case troops.machine: {
-      click(x_index+diff*2, y_index)
+      click(night_troop_x+night_troop_diff*3, night_troop_y)
       break
     }
   }
@@ -137,28 +152,29 @@ function night_send_troops() {
       }
       else if (count == 0) {
           // point barbarian
-          click_troops(troops.barbarian)
+          night_click_troops(troops.barbarian)
       }
-      else if (count == 20 || count == 25 || count == 30) {
-          click_troops(troops.machine)
+      else if (count == 25 || count == 30) {
+          night_click_troops(troops.machine)
           let num = random(0, night_attack_points.length-1)
           click(night_attack_points[num].x, night_attack_points[num].y)
+          night_click_troops(troops.machine)
           sleep(random(1000, 2000))
           // 点击炮车长按
-          click_troops(troops.cannon)
+          night_click_troops(troops.cannon)
           longClick(night_attack_points[num].x+10, night_attack_points[num].y+10)
           sleep(500)
       }
-      else if (count == 21 || count == 26 || count == 31) {
+      else if (count > 25 && count < 86 && count % 6 == 0) {
           // 点一下技能
-          click_troops(troops.machine)
-          click_troops(troops.barbarian)
+          night_click_troops(troops.machine)
+          night_click_troops(troops.barbarian)
       }
-      else if (count > 70) {
-          click_troops(troops.machine)
+      else if (count > 85) {
+          night_click_troops(troops.machine)
           sleep(300)
           let base = images.captureScreen()
-          let result = images.matchTemplate(base, night_back_image, {threshold: 0.5})
+          let result = images.matchTemplate(base, night_back_image, {threshold: 0.8})
           if (result.matches[0]) {
               toastLog("back")
               click(1185, 1000)
