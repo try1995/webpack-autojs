@@ -257,7 +257,7 @@ function day_ocr_source() {
       for (var i = 0; i < res.length; i ++) { 
         let text = res[i].replace(" ","")
         text = text.replace("I", "1")
-        text = text.replace("S", "5")
+        text = text.replace("S", "")
         text = text.replace("o", "0")
         text = parseInt(text)
         switch(i)
@@ -276,9 +276,6 @@ function day_ocr_source() {
               day_resources.trophy = text
               break
           }
-      }
-      if (day_resources.trophy > 60) {
-        continue
       }
       if (day_resources.gold) {
         toastLog(`result: ${JSON.stringify(day_resources)}`)
