@@ -58,7 +58,8 @@ var troops = {
 let night_troop_x
 let night_troop_y
 let night_troop_diff
-
+let right_point
+let bottom_point
 // --------------------------------------------------
 function init_vars() {
     base_path = "../images/coc/"
@@ -81,6 +82,8 @@ function init_vars() {
       night_troop_x = 738
       night_troop_y = 1016
       night_troop_diff = 150
+      right_point = 2370
+      bottom_point = 1100
     }
     else {
       console.log("table")
@@ -100,8 +103,6 @@ function night_find_board(base, right_point, bottom_point) {
 }
 
 function night_draw_board() {
-  var lef_point = 0
-  var right_point = 2370
   var points
   do {
       sleep(100)
@@ -109,13 +110,13 @@ function night_draw_board() {
       points = night_find_board(base, 2294, 892)
   } while (points.length < 45);
   for (let i=0; i < points.length; i++) {
-      if (points[i].x< (lef_point+right_point)/2) {
+      if (points[i].x < right_point / 2) {
           points[i].x -= 35
       }
       else {
           points[i].x += 35
       }
-      if (points[i].y < 1100 / 2) {
+      if (points[i].y < bottom_point / 2) {
         points[i].y -= 20
       }
       else {
@@ -173,14 +174,32 @@ function night_send_troops() {
           night_click_troops(troops.machine)
           click(night_attack_points[num].x, night_attack_points[num].y)
           night_click_troops(troops.machine)
-          sleep(random(1000, 2000))
-          // 点击炮车长按
+          sleep(random(300, 800))
+          // 
           night_click_troops(troops.cannon)
-          press(night_attack_points[num].x+10, night_attack_points[num].y+10, 1000)
-          sleep(500)
+          for (let i = 0; i < 10 ; i++) {
+            x_diff = random(10, 80)
+            y_diff = random(10, 60)
+            let point = night_attack_points[num]
+            if (point.x < right_point / 2) {
+                point.x -= x_diff
+            }
+            else {
+                point.x += x_diff
+            }
+            if (point.y < bottom_point / 2) {
+              point.y -= y_diff
+            }
+            else {
+              point.y += y_diff
+            }
+            click(point.x, point.y)
+            sleep(100)
+          }
+          // press(night_attack_points[num].x+10, night_attack_points[num].y+10, 1000)
       }
       else if (count > 25 && count < 100 && count % 6 == 0) {
-          // 点一下技能
+          // skill
           night_click_troops(troops.machine)
           night_click_troops(troops.barbarian)
       }
