@@ -176,7 +176,7 @@ function night_send_troops() {
           sleep(random(1000, 2000))
           // 点击炮车长按
           night_click_troops(troops.cannon)
-          longClick(night_attack_points[num].x+10, night_attack_points[num].y+10)
+          press(night_attack_points[num].x+10, night_attack_points[num].y+10, 1000)
           sleep(500)
       }
       else if (count > 25 && count < 100 && count % 6 == 0) {
@@ -194,9 +194,12 @@ function night_send_troops() {
               click(1185, 1000)
               break
           }
+          if (count % 5 == 0) {
+              night_click_troops(troops.barbarian)
+              press(night_attack_points[num].x, night_attack_points[num].y, 1000)
+          }
       }
       else {
-          let num = random(0, night_attack_points.length-1)
           click(night_attack_points[num].x, night_attack_points[num].y)
           sleep(random(30, 70))
       }
