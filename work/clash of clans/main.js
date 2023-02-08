@@ -61,7 +61,7 @@ let night_troop_diff
 
 // --------------------------------------------------
 function init_vars() {
-    base_path = "/sdcard/脚本/images/coc/"
+    base_path = "../images/coc/"
     day_source_clip_path = base_path + "source_clip.png"
     retreat_image = images.read(base_path + "retreat.jpg")
     day_next_image = images.read(base_path + "next_clip.jpg")
