@@ -6,7 +6,7 @@
  * @FilePath: \webpack-autojs\work\auto_sign_in\main.js
  * @Description: 上下班自动打卡
  */
-toast("上下班自动打卡服务已经启动")
+toast("auto_sigin_in service...")
 
 const isWeekDay = (date) => date.getDay() % 6 !== 0
 let appName
@@ -29,13 +29,17 @@ function init_var() {
 }
 
 function sign_in() {
-    device.wakeUp()
-    log(`启动${appName}`)
-    let ret = launchApp(appName)
-    if (!ret) {
-        log(`启动${appName}失败`)
+    if (device.isScreenOn()) {
+        log(`启动${appName}`)
+        let ret = launchApp(appName)
+        if (!ret) {
+            log(`启动${appName}失败`)
+        }
     }
-    sleep(10*60*1000)
+    else {
+        device.wakeUp()
+        de
+    }
 }
 
 function main() {
@@ -44,32 +48,26 @@ function main() {
         let date = new Date()
         if (isWeekDay(date) || debug_s) {
             if (date.getHours() == am_in[0]) {
-                // 上班打卡
                 if (date.getMinutes() >= am_in[1]) {
                     sign_in()
                 }
                 else {
-                    // 休眠
                     sleep(2*1000)
                 }
             }
             else if (date.getHours() == pm_out[0]) {
-                // 下班打卡
                 if (date.getMinutes() >= pm_out[1]) {
                     sign_in()
                 }
                 else {
-                    // 休眠
                     sleep(2*1000)
                 }
             }
             else if (date.getHours() == am_in[0] - 1 || date.getHours() == pm_out[0] - 1) {
-                // 休眠10分钟
                 sleep(10*60*1000)
             }
             else {
                 sleep(60*60*1000)
-                //休眠60分钟
             }
         }
         else {
