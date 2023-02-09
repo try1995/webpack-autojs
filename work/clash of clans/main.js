@@ -150,12 +150,15 @@ function night_click_troops(troop) {
       click(night_troop_x, night_troop_y)
       break
     }
+    case troops.bomber: {
+      click(night_troop_x+night_troop_diff*1, night_troop_y)
+    }
     case troops.cannon: {
-      click(night_troop_x+night_troop_diff, night_troop_y)
+      click(night_troop_x+night_troop_diff*2, night_troop_y)
       break
     }
     case troops.machine: {
-      click(night_troop_x+night_troop_diff*2, night_troop_y)
+      click(night_troop_x+night_troop_diff*3, night_troop_y)
       break
     }
   }
@@ -163,6 +166,7 @@ function night_click_troops(troop) {
 
 function night_send_troops() {
   let count = 0
+  let barbarian_count = 20
   while (true) {
     let num = random(0, night_attack_points.length-1)
       if (count > 888) {
@@ -172,14 +176,19 @@ function night_send_troops() {
           // point barbarian
           night_click_troops(troops.barbarian)
       }
-      else if (count == 25 || count == 30) {
+      else if (count == barbarian_count*1.5 || count == barbarian_count*2) {
           night_click_troops(troops.machine)
           click(night_attack_points[num].x, night_attack_points[num].y)
           night_click_troops(troops.machine)
           sleep(random(300, 800))
           // 
-          night_click_troops(troops.cannon)
           for (let i = 0; i < 10 ; i++) {
+            if (i % 2 == 0) {
+              night_click_troops(troops.cannon)
+            }
+            else {
+              night_click_troops(troops.bomber)
+            }
             let x_diff = random(10, 280)
             let y_diff = random(10, 260)
             let point = night_attack_points[num]
@@ -203,12 +212,12 @@ function night_send_troops() {
           }
           // press(night_attack_points[num].x+10, night_attack_points[num].y+10, 1000)
       }
-      else if (count > 25 && count < 100 && count % 6 == 0) {
+      else if (count > barbarian_count*2 && count < barbarian_count*4 && count % 6 == 0) {
           // skill
           night_click_troops(troops.machine)
           night_click_troops(troops.barbarian)
       }
-      else if (count > 100) {
+      else if (count > barbarian_count*4) {
           night_click_troops(troops.machine)
           sleep(300)
           let base = images.captureScreen()
