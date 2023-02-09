@@ -104,23 +104,25 @@ function night_find_board(base, right_point, bottom_point) {
 
 function night_draw_board() {
   var points
+  let count=0
   do {
+      count+=1
       sleep(100)
       var base = images.captureScreen();
       points = night_find_board(base, 2294, 892)
-  } while (points.length < 45);
+  } while (points.length < 300 && count<3);
   for (let i=0; i < points.length; i++) {
       if (points[i].x < right_point / 2) {
-          points[i].x -= 35
+          points[i].x -= 25
       }
       else {
-          points[i].x += 35
+          points[i].x += 25
       }
       if (points[i].y < bottom_point / 2) {
-        points[i].y -= 20
+        points[i].y -= 10
       }
       else {
-        points[i].y += 20
+        points[i].y += 10
       }
   }
   toastLog(`find ${points.length} point`)
@@ -178,8 +180,8 @@ function night_send_troops() {
           // 
           night_click_troops(troops.cannon)
           for (let i = 0; i < 10 ; i++) {
-            x_diff = random(10, 80)
-            y_diff = random(10, 60)
+            let x_diff = random(10, 280)
+            let y_diff = random(10, 260)
             let point = night_attack_points[num]
             if (point.x < right_point / 2) {
                 point.x -= x_diff
@@ -192,6 +194,9 @@ function night_send_troops() {
             }
             else {
               point.y += y_diff
+            }
+            if (point.x < 1 || point.y < 1) {
+                continue
             }
             click(point.x, point.y)
             sleep(100)
