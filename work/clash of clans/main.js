@@ -41,6 +41,7 @@ var day_next_point
 var day_next_image
 var day_source_clip_path
 var retreat_image
+var source_clip_ret
 // --------------------night-----------------------
 var night_back_image  // 回营
 var night_find_image
@@ -62,7 +63,7 @@ let right_point
 let bottom_point
 // --------------------------------------------------
 function init_vars() {
-    base_path = "../images/coc/"
+    base_path = "./images/coc/"
     day_source_clip_path = base_path + "source_clip.png"
     log("isfile", files.isFile(day_source_clip_path))
     retreat_image = images.read(base_path + "retreat.jpg")
@@ -81,17 +82,27 @@ function init_vars() {
       day_attack_point = [260, 1021]
       day_find_point = [1500, 650]
       day_next_point = [2000, 780]
+      source_clip_ret = [163, 149, 366-187, 400-130]
       night_troop_x = 738
       night_troop_y = 1016
       night_troop_diff = 150
       right_point = 2370
       bottom_point = 1100
     }
+    if (device.product == "YAL-AL00") {
+      console.log("honor")
+      day_attack_point = [215, 960]
+      day_find_point = [1600, 640]
+      day_next_point = [2048, 755]
+      source_clip_ret = [163, 149, 366-187, 400-130]
+    }
     else {
+      //小平板识别不了图片，别折腾了
       console.log("table")
       day_attack_point = [129, 1080]
       day_find_point = [1328, 700]
-      day_next_point = [2103, 835] 
+      day_next_point = [1748, 904] 
+      source_clip_ret = [81, 130, 247-81, 295-130]
     }
 }
 
@@ -279,15 +290,17 @@ function day_ocr_source() {
   // var temp_path = "./temp/temp.png"
 
   // find next, then orc_source
+  _threshold = 0.8
   while (max_loop) {
     // images.captureScreen(temp_path)
     // var src = images.read(temp_path)
     var src = images.captureScreen()
-    let result = images.matchTemplate(src, day_next_image, {threshold: 0.8})
+    // images.saveImage(src, "/sdcard/1.png")
+    let result = images.matchTemplate(src, day_next_image, {threshold: _threshold})
     if (result.matches[0]) {
       console.log("find the next button")
       console.log(result.matches[0])
-      var source_clip = images.clip(src, 163, 149, 366-187, 400-130)
+      var source_clip = images.clip(src, source_clip_ret[0], source_clip_ret[1], source_clip_ret[2], source_clip_ret[3])
       images.saveImage(source_clip, day_source_clip_path)
       console.log("save source clip image")
       var res = gmlkit.ocr(source_clip, "zh").text.split("\n")
@@ -322,14 +335,14 @@ function day_ocr_source() {
     }
     max_loop--
     sleep(300)
+    _threshold -= 0.02
   }
   
 }
 
 function day_find_attack(target) {
   // singal target
-    if (day_resources.gold > target.gold + 200000 || day_resources.elixir > target.elixir + 200000
-  || day_resources.dark_exixir > target.dark_exixir || day_resources.trophy > target.trophy) {
+  if (day_resources.elixir > target.elixir || day_resources.dark_exixir > target.dark_exixir || day_resources.trophy > target.trophy) {
     return true
   }
   // gold + elixir 
@@ -353,13 +366,13 @@ function day_mutiplayer() {
 
   var target = {
   gold: 850000,
-  elixir: 750000,
-  dark_exixir: 10000,
-  trophy:41
+  elixir: 1100000,
+  dark_exixir: 11000,
+  trophy:40
   }
 
   var count = 1
-  var max_serch = 50
+  var max_serch = 5000
   while (true) {
     console.log(`find ${count} times`)
     day_ocr_source()
