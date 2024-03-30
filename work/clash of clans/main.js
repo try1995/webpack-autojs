@@ -19,8 +19,9 @@ if(device.sdkInt>28){
         text('ALLOW').click()
     })
 }
+//false 竖屏截图，true 横屏
 //require captureScreen authority
-if (!requestScreenCapture()) {
+if (!requestScreenCapture(true)) {
     toast("require captureScreen authority fail")
     exit()
 }
@@ -64,6 +65,7 @@ let bottom_point
 function init_vars() {
     base_path = "../images/coc/"
     day_source_clip_path = base_path + "source_clip.png"
+    log("isfile", files.isFile(day_source_clip_path))
     retreat_image = images.read(base_path + "retreat.jpg")
     day_next_image = images.read(base_path + "next_clip.jpg")
     day_attack_image = images.read(base_path + "day_attack.jpg")
@@ -74,11 +76,12 @@ function init_vars() {
     night_find_image = images.read(base_path + "night_find.jpg") 
     night_back_image = images.read(base_path + "night_back.jpg")
 
-    if (device.product == "ELZ-AN00") {
+    console.log(device.product)
+    if (device.product == "dipper") {
       console.log("phone")
       day_attack_point = [260, 1021]
-      day_find_point = [1700, 765]
-      day_next_point = [2103, 835]
+      day_find_point = [1500, 650]
+      day_next_point = [2000, 780]
       night_troop_x = 738
       night_troop_y = 1016
       night_troop_diff = 150
@@ -285,7 +288,7 @@ function day_ocr_source() {
     if (result.matches[0]) {
       console.log("find the next button")
       console.log(result.matches[0])
-      var source_clip = images.clip(src, 183, 155, 366-187, 400-130)
+      var source_clip = images.clip(src, 163, 149, 366-187, 400-130)
       images.saveImage(source_clip, day_source_clip_path)
       console.log("save source clip image")
       var res = gmlkit.ocr(source_clip, "zh").text.split("\n")
@@ -327,7 +330,7 @@ function day_ocr_source() {
 function day_find_attack(target) {
   // singal target
     if (day_resources.gold > target.gold + 200000 || day_resources.elixir > target.elixir + 200000
-  || day_resources.dark_exixir > target.dark_exixir + 2000 || day_resources.trophy > target.trophy + 10) {
+  || day_resources.dark_exixir > target.dark_exixir || day_resources.trophy > target.trophy) {
     return true
   }
   // gold + elixir 
@@ -350,10 +353,10 @@ function day_mutiplayer() {
   click(day_find_point[0], day_find_point[1])
 
   var target = {
-  gold: 700000,
+  gold: 850000,
   elixir: 750000,
-  dark_exixir: 7500,
-  trophy:35
+  dark_exixir: 10000,
+  trophy:41
   }
 
   var count = 1
@@ -386,18 +389,19 @@ function day_mutiplayer() {
 // ---------------------------------------------main---------------
 function main() {
     init_vars()
-    let base = images.captureScreen()
-    images.saveImage(base, base_path + "temp.png")
-    let result = images.matchTemplate(base, day_attack_image, {threshold: 0.5})
-    log(result)
-    if (result.matches[0])  {
-        toastLog("day world!")
-        day_mutiplayer()
-    }
-    else {
-        toastLog("night world!")
-        night_mutiplayer()
-    }
+    day_mutiplayer()
+    // let base = images.captureScreen()
+    // images.saveImage(base, base_path + "temp.png")
+    // let result = images.matchTemplate(base, day_attack_image, {threshold: 0.5})
+    // log(result)
+    // if (result.matches[0])  {
+    //     toastLog("day world!")
+    //     day_mutiplayer()
+    // }
+    // else {
+    //     toastLog("night world!")
+    //     night_mutiplayer()
+    // }
 }
 
 home()
