@@ -41,7 +41,6 @@ var day_next_point
 var day_next_image
 var day_source_clip_path
 var retreat_image
-
 // --------------------night-----------------------
 var night_back_image  // 回营
 var night_find_image
